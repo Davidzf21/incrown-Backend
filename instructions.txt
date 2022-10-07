@@ -1,0 +1,12 @@
+################################################################################################################
+Para desplegar la aplicacion, hacer 'commit' y 'push' en el repositorio del proyecto, en la rama master.
+    Una vez que los archivos esten subidos en GitHub, meterse en https://render.com, y en el panel 'Dashboard' 
+    acceder al repositorio del proyecto 'incrown' y hacer click en la opción 'Deploy'.
+################################################################################################################
+
+################################################################################################################
+Para acceder a la API Rest, copiar el siguente link en el navegador
+    --> https://incrown.onrender.com/incrown_app/{example}
+
+    Siendo {example}, el servicio que se ha creado en 'url.py', en el directorio './incrown_app/urls.py'
+################################################################################################################
