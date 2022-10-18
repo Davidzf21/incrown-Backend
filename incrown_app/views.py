@@ -1,14 +1,15 @@
 from webbrowser import get
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .models import Usuario
-from .serializers import UsuarioSerializer
+from .models import Usuario, Evento
+from .serializers import UsuarioSerializer, EventoSerializer
 from django.contrib.auth.hashers import make_password, check_password
 
 #
 # Funciones del USUARIO
 #
 class UsuarioCreate(generics.CreateAPIView):
+   # API endpoint that allows creation of a new Usuario
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
     def post(self, request, *args, **kwargs):
@@ -64,3 +65,42 @@ class UsuarioDelete(generics.RetrieveDestroyAPIView):
 #
 # Funciones del EVENTO
 #
+class EventoCreate(generics.CreateAPIView):
+    # API endpoint that allows creation of a new Evento
+    queryset = Evento.objects.all()
+    serializer_class = EventoSerializer
+    def post(self, request, *args, **kwargs):
+      response = {}
+      us = Usuario.objects.filter(username=request.data['organizador'])
+      if(us):
+         us = Usuario.objects.get(username=request.data['organizador'])
+         us.numEventosCreados = us.numEventosCreados + 1
+         us.save()
+         self.create(request, *args, **kwargs)
+         response['success'] = True
+         response['message'] = "Evento creado exitosamente"
+         response['status'] = status.HTTP_201_CREATED
+         return Response(response)
+      else:
+         response['success'] = False
+         response['message'] = "No existe un usuario organizador"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+         return Response(response)
+
+class EventoList(generics.ListAPIView):
+    queryset = Evento.objects.all()
+    serializer_class = EventoSerializer
+
+class EventoUpdate(generics.RetrieveUpdateAPIView):
+    # API endpoint that allows a Evento record to be updated.
+    queryset = Evento.objects.all()
+    lookup_field = 'nombre'
+    serializer_class = EventoSerializer
+    def put(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+class EventoDelete(generics.RetrieveDestroyAPIView):
+    # API endpoint that allows a Evento record to be deleted.
+    queryset = Evento.objects.all()
+    lookup_field = 'nombre'
+    serializer_class = EventoSerializer
