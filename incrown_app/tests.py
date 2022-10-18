@@ -12,7 +12,7 @@ url_web = 'https://incrown.onrender.com/incrown_app/'
 
 # TEST USUARIOS
 def test_usuarios(url):
-    print("----------------\nTEST: USUARIOS")
+    print("-----------------------------------------------------\nTEST: USUARIOS")
     #Creacion
     auth_data = {'nombre': 'prueba', 'username': 'prueba', 'correo': 'prueba@gmail.com', 'password': '1234'}
     requests.post(url + 'CreateUsuario/', data=auth_data)
@@ -39,46 +39,46 @@ def test_usuarios(url):
         print("\t -> ELIMINACION DE UN USUARIO --> FUNCIONA")
     else:
         print("\t -> ELIMINACION DE UN USUARIO --> NO FUNCIONA")
-    print("----------------\n")
+    print("-----------------------------------------------------\n")
 
 # TEST EVENTOS
 def test_eventos(url):
-    print("----------------\nTEST: EVENTOS")
+    print("-----------------------------------------------------\nTEST: EVENTOS")
     #Creacion
     auth_data_us = {'nombre': 'evento_prueba', 'username': 'evento_prueba', 'correo': 'prueba@gmail.com', 
         'password': '1234'}
     requests.post(url + 'CreateUsuario/', data=auth_data_us)
     auth_data_ev = {'nombre': 'evento_prueba', 'descripcion': 'evento_prueba', 'fecha': '12/12/12', 
-        'hora': '12', 'esPublico': TRUE, 'aforo': 12, 'categoria': 'evento_prueba', 'organizador': 'evento_prueba'}
-    resp = requests.post(url + 'CreateEvento/', data=auth_data_ev)
-    print(resp)
-    #resp = requests.get(url + 'Evento/evento_prueba')
-    #t = resp.json()
-    #print(t)
-    #if "evento_prueba" in t['nombre']:
-    #    print("\t -> CREACION DE UN EVENTO --> FUNCIONA")
-    #else:
-    #    print("\t -> CREACION DE UN EVENTO --> NO FUNCIONA")
+        'hora': '12', 'aforo': 12, 'categoria': 'evento_prueba', 'organizador': 'evento_prueba'}
+    requests.post(url + 'CreateEvento/', data=auth_data_ev)
+    resp = requests.get(url + 'Evento/evento_prueba')
+    t = resp.json()
+    if "evento_prueba" in t['nombre']:
+        print("\t -> CREACION DE UN EVENTO --> FUNCIONA")
+    else:
+        print("\t -> CREACION DE UN EVENTO --> NO FUNCIONA")
     #Modificacion
-    #auth_data = {'nombre': 'prueba1', 'username': 'prueba', 'correo': 'prueba1@gmail.com', 'password': '12345'}
-    #requests.put(url + 'UpdateUsuario/prueba/', data=auth_data)
-    #resp = requests.get(url + 'Usuario/prueba')
-    #t = resp.json()
-    #if ("prueba1" in t['nombre']) & ("prueba1@gmail.com" in t['correo']):
-    #    print("\t -> MODIFICACION DE UN USUARIO --> FUNCIONA")
-    #else:
-    #    print("\t -> MODIFICACION DE UN USUARIO --> NO FUNCIONA")
+    auth_data_ev = {'nombre': 'evento_prueba', 'descripcion': 'evento_prueba1', 'fecha': '13/12/12', 
+        'hora': '13', 'aforo': 13, 'categoria': 'evento_prueba1', 'organizador': 'evento_prueba'}
+    resp = requests.put(url + 'UpdateEvento/evento_prueba/', data=auth_data_ev)
+    resp = requests.get(url + 'Evento/evento_prueba')
+    t = resp.json()
+    if ("evento_prueba1" in t['descripcion']) & ("13/12/12" in t['fecha']) & ("13" in t['hora']) & ("evento_prueba1" in t['categoria']):
+        print("\t -> MODIFICACION DE UN USUARIO --> FUNCIONA")
+    else:
+        print("\t -> MODIFICACION DE UN USUARIO --> NO FUNCIONA")
     #Eliminacion
-    #requests.delete(url + 'DeleteUsuario/prueba')
-    #resp = requests.get(url + 'Usuario/prueba')
-    #t = resp.json()
-    #if "Not found." in t['detail']:
-    #    print("\t -> ELIMINACION DE UN USUARIO --> FUNCIONA")
-    #else:
-    #    print("\t -> ELIMINACION DE UN USUARIO --> NO FUNCIONA")
-    #print("----------------\n")
+    requests.delete(url + 'DeleteEvento/evento_prueba')
+    resp = requests.get(url + 'Evento/evento_prueba')
+    t = resp.json()
+    if "Not found." in t['detail']:
+        print("\t -> ELIMINACION DE UN USUARIO --> FUNCIONA")
+    else:
+        print("\t -> ELIMINACION DE UN USUARIO --> NO FUNCIONA")
+    requests.delete(url + 'DeleteUsuario/evento_prueba')
+    print("-----------------------------------------------------\n")
 
 if __name__ == "__main__":
     pruebas = url_prueba
-    #test_usuarios(pruebas)
+    test_usuarios(pruebas)
     test_eventos(pruebas)
