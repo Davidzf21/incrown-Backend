@@ -87,20 +87,25 @@ class EventoCreate(generics.CreateAPIView):
          response['status'] = status.HTTP_400_BAD_REQUEST
          return Response(response)
 
-class EventoList(generics.ListAPIView):
+class EventosList(generics.ListAPIView):
+   queryset = Evento.objects.all()
+   serializer_class = EventoSerializer
+
+class EventoList(generics.RetrieveAPIView):
+    lookup_field = 'nombre'
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
 
 class EventoUpdate(generics.RetrieveUpdateAPIView):
-    # API endpoint that allows a Evento record to be updated.
-    queryset = Evento.objects.all()
-    lookup_field = 'nombre'
-    serializer_class = EventoSerializer
-    def put(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
+   # API endpoint that allows a Evento record to be updated.
+   queryset = Evento.objects.all()
+   lookup_field = 'nombre'
+   serializer_class = EventoSerializer
+   def put(self, request, *args, **kwargs):
+      return self.partial_update(request, *args, **kwargs)
 
 class EventoDelete(generics.RetrieveDestroyAPIView):
-    # API endpoint that allows a Evento record to be deleted.
-    queryset = Evento.objects.all()
-    lookup_field = 'nombre'
-    serializer_class = EventoSerializer
+   # API endpoint that allows a Evento record to be deleted.
+   queryset = Evento.objects.all()
+   lookup_field = 'nombre'
+   serializer_class = EventoSerializer
