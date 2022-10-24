@@ -13,3 +13,9 @@ class EventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evento
         fields = ['nombre', 'descripcion', 'fecha', 'hora', 'esPublico', 'aforo', 'categoria', 'organizador']
+
+class EventoSerializerAll(serializers.ModelSerializer):
+    participantes = UsuarioSerializer(read_only=True, many=True)
+    class Meta:
+        model = Evento
+        fields = ['nombre', 'descripcion', 'fecha', 'hora', 'esPublico', 'aforo', 'categoria', 'organizador', 'participantes']

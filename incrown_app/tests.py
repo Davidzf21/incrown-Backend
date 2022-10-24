@@ -78,7 +78,42 @@ def test_eventos(url):
     requests.delete(url + 'DeleteUsuario/evento_prueba')
     print("-----------------------------------------------------\n")
 
+# TEST PARTICIPANTES
+def test_participantes(url):
+    print("-----------------------------------------------------\nTEST: PARTICIPANTES")
+    auth_data_us = {'nombre': 'user_prueba', 'username': 'user_prueba', 'correo': 'prueba@gmail.com', 
+        'password': '1234'}
+    requests.post(url + 'CreateUsuario/', data=auth_data_us)
+    auth_data_ev = {'nombre': 'evento_prueba', 'descripcion': 'evento_prueba', 'fecha': '12/12/12', 
+        'hora': '12', 'aforo': 12, 'categoria': 'evento_prueba', 'organizador': 'user_prueba'}
+    requests.post(url + 'CreateEvento/', data=auth_data_ev)
+    # AÑADIR PARTICIPANTE
+    resp = requests.get(url + 'anadirParticipante/evento_prueba/user_prueba/')
+    t = resp.json()
+    if "correctamente" in t['message']:
+        print("\t -> AÑADIR PARTICIPANTE --> FUNCIONA")
+    else:
+        print("\t -> AÑADIR PARTICIPANTE --> NO FUNCIONA")
+    # COMPROBAR PARTICIPANTE
+    resp = requests.get(url + 'esParticipante/evento_prueba/user_prueba/')
+    t = resp.json()
+    if "TRUE" in t['message']:
+        print("\t -> COMPROBAR PARTICIPANTE --> FUNCIONA")
+    else:
+        print("\t -> COMPROBAR PARTICIPANTE --> NO FUNCIONA")
+    # ELIMINAR PARTICIPANTE
+    resp = requests.get(url + 'deleteParticipante/evento_prueba/user_prueba/')
+    t = resp.json()
+    if "correctamente" in t['message']:
+        print("\t -> ELIMINAR PARTICIPANTE --> FUNCIONA")
+    else:
+        print("\t -> ELIMINAR PARTICIPANTE --> NO FUNCIONA")
+    requests.delete(url + 'DeleteEvento/evento_prueba')
+    requests.delete(url + 'DeleteUsuario/user_prueba')
+    print("-----------------------------------------------------\n")
+
 if __name__ == "__main__":
     pruebas = url_prueba
     test_usuarios(pruebas)
     test_eventos(pruebas)
+    test_participantes(pruebas)
