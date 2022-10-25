@@ -103,6 +103,11 @@ class EventoList(generics.RetrieveAPIView):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
 
+class EventoListUsuario(generics.RetrieveAPIView):
+    lookup_field = 'organizador'
+    queryset = Evento.objects.all()
+    serializer_class = EventoSerializer
+
 class EventoListAll(generics.ListAPIView):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializerAll

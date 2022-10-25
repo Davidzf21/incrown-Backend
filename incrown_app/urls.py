@@ -1,6 +1,6 @@
 from django.urls import include, path
 from .views import UsuarioCreate, UsuarioUpdate, UsuarioList, UsuariosList, UsuarioDelete
-from .views import EventoCreate, EventosList, EventoList, EventoListAll, EventoUpdate, EventoDelete, anadirParticipante, eliminarParticipante, esParticipante
+from .views import EventoCreate, EventosList, EventoList, EventoListAll, EventoListUsuario, EventoUpdate, EventoDelete, anadirParticipante, eliminarParticipante, esParticipante
 
 urlpatterns = [
     # USUARIOS
@@ -14,6 +14,7 @@ urlpatterns = [
     path('CreateEvento/', EventoCreate.as_view(), name='create-evento'),
     path('Eventos/', EventosList.as_view(), name='list-eventos'),
     path('Evento/<str:nombre>/', EventoList.as_view()),
+    path('Eventos/<str:organizador>/', EventoListUsuario.as_view()),
     path('EventosAll/', EventoListAll.as_view()),
     path('UpdateEvento/<str:nombre>/', EventoUpdate.as_view(), name='update-evento'),
     path('DeleteEvento/<str:nombre>/', EventoDelete.as_view(), name='delete-evento'),
