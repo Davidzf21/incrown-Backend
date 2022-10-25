@@ -84,7 +84,7 @@ class EventoCreate(generics.CreateAPIView):
       else:
          response['success'] = False
          response['message'] = "No existe un usuario organizador"
-         response['status'] = status.HTTP_400_BAD_REQUEST
+         response['status'] = status.HTTP_200_OK
          return Response(response)
 
 class EventosList(generics.ListAPIView):
