@@ -86,7 +86,7 @@ class EventoCreate(generics.CreateAPIView):
             self.create(request, *args, **kwargs)
             response['success'] = True
             response['message'] = "Evento creado exitosamente"
-            response['status'] = status.HTTP_201_CREATED
+            response['status'] = status.HTTP_200_OK
             return Response(response)
       else:
          response['success'] = False

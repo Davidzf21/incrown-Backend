@@ -64,9 +64,9 @@ def test_eventos(url):
     resp = requests.get(url + 'Evento/evento_prueba')
     t = resp.json()
     if ("evento_prueba1" in t['descripcion']) & ("13/12/12" in t['fecha']) & ("13" in t['hora']) & ("evento_prueba1" in t['categoria']):
-        print("\t -> MODIFICACION DE UN USUARIO --> FUNCIONA")
+        print("\t -> MODIFICACION DE UN EVENTO--> FUNCIONA")
     else:
-        print("\t -> MODIFICACION DE UN USUARIO --> NO FUNCIONA")
+        print("\t -> MODIFICACION DE UN EVENTO --> NO FUNCIONA")
     #Eliminacion
     requests.delete(url + 'DeleteEvento/evento_prueba')
     resp = requests.get(url + 'Evento/evento_prueba')
