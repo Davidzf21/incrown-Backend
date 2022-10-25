@@ -74,17 +74,23 @@ class EventoCreate(generics.CreateAPIView):
       us = Usuario.objects.filter(username=request.data['organizador'])
       if(us):
          us = Usuario.objects.get(username=request.data['organizador'])
-         us.numEventosCreados = us.numEventosCreados + 1
-         us.save()
-         self.create(request, *args, **kwargs)
-         response['success'] = True
-         response['message'] = "Evento creado exitosamente"
-         response['status'] = status.HTTP_201_CREATED
-         return Response(response)
+         ev = Evento.objects.filter(nombre=request.data['nombre'])
+         if(ev):
+            response['success'] = False
+            response['message'] = "Ya existe un evento con ese nombre"
+            response['status'] = status.HTTP_409_CONFLICT
+         else:
+            us.numEventosCreados = us.numEventosCreados + 1
+            us.save()
+            self.create(request, *args, **kwargs)
+            response['success'] = True
+            response['message'] = "Evento creado exitosamente"
+            response['status'] = status.HTTP_201_CREATED
+            return Response(response)
       else:
          response['success'] = False
          response['message'] = "No existe un usuario organizador"
-         response['status'] = status.HTTP_200_OK
+         response['status'] = status.HTTP_409_CONFLICT
          return Response(response)
 
 class EventosList(generics.ListAPIView):
