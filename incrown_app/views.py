@@ -78,7 +78,7 @@ class EventoCreate(generics.CreateAPIView):
          if(ev):
             response['success'] = False
             response['message'] = "Ya existe un evento con ese nombre"
-            response['status'] = status.HTTP_409_CONFLICT´
+            response['status'] = status.HTTP_409_CONFLICT
             return Response(response)
          else:
             us.numEventosCreados = us.numEventosCreados + 1
