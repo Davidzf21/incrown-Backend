@@ -141,6 +141,7 @@ class anadirParticipante(generics.ListAPIView):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
     def list(self, request, *args, **kwargs):
+         response = {}
          nomEvento=self.kwargs['nomEvento']
          nomUsuario=self.kwargs['nomUsuario']
          ev = Evento.objects.filter(nombre=nomEvento)
@@ -153,19 +154,32 @@ class anadirParticipante(generics.ListAPIView):
                evento.participantes.add(usuario)
                afterInsert = Evento.objects.filter(participantes=usuario).count()
                if  beforeInsert == afterInsert:
-                  return Response({'message': 'ERROR: No se ha introducido o el usuario ya es participante'}, status=status.HTTP_409_CONFLICT)
+                  response['success'] = False
+                  response['message'] = "ERROR: No se ha introducido o el usuario ya es participante"
+                  response['status'] = status.HTTP_409_CONFLICT
+                  return Response(response)
                else:
                   usuario.numEventosParticipa = usuario.numEventosParticipa + 1
-                  return Response({'message': 'Se ha introducido correctamente'}, status=status.HTTP_200_OK)
+                  response['success'] = True
+                  response['message'] = "Se ha introducido correctamente"
+                  response['status'] = status.HTTP_200_OK
+                  return Response(response)
             else:
-               return Response({'message': 'ERROR: No existe el usuario'}, status=status.HTTP_409_CONFLICT)
+               response['success'] = False
+               response['message'] = "ERROR: No existe el usuario"
+               response['status'] = status.HTTP_409_CONFLICT
+               return Response(response)
          else:
-            return Response({'message': 'ERROR: No existe el evento'}, status=status.HTTP_409_CONFLICT)
+            response['success'] = False
+            response['message'] = "ERROR: No existe el evento"
+            response['status'] = status.HTTP_409_CONFLICT
+            return Response(response)
 
 class esParticipante(generics.ListAPIView):
    queryset = Usuario.objects.all()
    serializer_class = UsuarioSerializer
    def list(self, request, *args, **kwargs):
+      response = {}
       nomEvento=self.kwargs['nomEvento']
       nomUsuario=self.kwargs['nomUsuario']
       us = Usuario.objects.filter(username=nomUsuario)
@@ -175,19 +189,32 @@ class esParticipante(generics.ListAPIView):
          if num:
             num = Evento.objects.filter(participantes=usuario)
             num = num.filter(nombre=nomEvento)
-            if  num:
-               return Response({'message': 'TRUE'}, status=status.HTTP_200_OK)
+            if num:
+               response['success'] = True
+               response['message'] = "TRUE"
+               response['status'] = status.HTTP_200_OK
+               return Response(response)
             else:
-               return Response({'message': 'FALSE'}, status=status.HTTP_200_OK)
+               response['success'] = False
+               response['message'] = "FALSE"
+               response['status'] = status.HTTP_200_OK
+               return Response(response)
          else:
-            return Response({'message': 'No existe el evento'}, status=status.HTTP_409_CONFLICT)
+            response['success'] = False
+            response['message'] = "ERROR: No existe el evento"
+            response['status'] = status.HTTP_409_CONFLICT
+            return Response(response)
       else:
-         return Response({'message': 'No existe el usuario'}, status=status.HTTP_409_CONFLICT)
+         response['success'] = False
+         response['message'] = "ERROR: No existe el usuario"
+         response['status'] = status.HTTP_409_CONFLICT
+         return Response(response)
 
 class eliminarParticipante(generics.ListAPIView):
    queryset = Evento.objects.all()
    serializer_class = EventoSerializer
    def list(self, request, *args, **kwargs):
+      response = {}
       nomEvento=self.kwargs['nomEvento']
       nomUsuario=self.kwargs['nomUsuario']
       ev = Evento.objects.filter(nombre=nomEvento)
@@ -200,11 +227,23 @@ class eliminarParticipante(generics.ListAPIView):
             evento.participantes.remove(usuario)
             afterInsert = Evento.objects.filter(participantes=usuario).count()
             if  beforeInsert <= afterInsert:
-               return Response({'message': 'ERROR: No se ha borrado o no era participente del evento'}, status=status.HTTP_409_CONFLICT)
+               response['success'] = False
+               response['message'] = "ERROR: No se ha borrado o no era participente del evento"
+               response['status'] = status.HTTP_409_CONFLICT
+               return Response(response)
             else:
                usuario.numEventosParticipa = usuario.numEventosParticipa - 1
-               return Response({'message': 'Se ha borrado correctamente'}, status=status.HTTP_200_OK)
+               response['success'] = True
+               response['message'] = "Se ha borrado correctamente"
+               response['status'] = status.HTTP_200_OK
+               return Response(response)
          else:
-            return Response({'message': 'ERROR: No existe el usuario'}, status=status.HTTP_409_CONFLICT)
+            response['success'] = False
+            response['message'] = "ERROR: No existe el usuario"
+            response['status'] = status.HTTP_409_CONFLICT
+            return Response(response)
       else:
-         return Response({'message': 'ERROR: No existe el evento'}, status=status.HTTP_409_CONFLICT)
+         response['success'] = False
+         response['message'] = "ERROR: No existe el evento"
+         response['status'] = status.HTTP_409_CONFLICT
+         return Response(response)
