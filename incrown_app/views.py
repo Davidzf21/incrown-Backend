@@ -1,8 +1,8 @@
 from webbrowser import get
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .models import Usuario, Evento
-from .serializers import EventoSerializerAll, UsuarioSerializer, EventoSerializer
+from .models import Usuario, Evento, Mensaje
+from .serializers import EventoSerializerAll, UsuarioSerializer, EventoSerializer, MensajeSerializer
 from django.contrib.auth.hashers import make_password, check_password
 
 #
@@ -79,7 +79,6 @@ class EventoCreate(generics.CreateAPIView):
             response['success'] = False
             response['message'] = "Ya existe un evento con ese nombre"
             response['status'] = status.HTTP_409_CONFLICT
-            return Response(response)
          else:
             us.numEventosCreados = us.numEventosCreados + 1
             us.save()
@@ -87,12 +86,11 @@ class EventoCreate(generics.CreateAPIView):
             response['success'] = True
             response['message'] = "Evento creado exitosamente"
             response['status'] = status.HTTP_200_OK
-            return Response(response)
       else:
          response['success'] = False
          response['message'] = "No existe un usuario organizador"
          response['status'] = status.HTTP_409_CONFLICT
-         return Response(response)
+      return Response(response)
 
 class EventosList(generics.ListAPIView):
    queryset = Evento.objects.all()
@@ -157,23 +155,20 @@ class anadirParticipante(generics.ListAPIView):
                   response['success'] = False
                   response['message'] = "ERROR: No se ha introducido o el usuario ya es participante"
                   response['status'] = status.HTTP_409_CONFLICT
-                  return Response(response)
                else:
                   usuario.numEventosParticipa = usuario.numEventosParticipa + 1
                   response['success'] = True
                   response['message'] = "Se ha introducido correctamente"
                   response['status'] = status.HTTP_200_OK
-                  return Response(response)
             else:
                response['success'] = False
                response['message'] = "ERROR: No existe el usuario"
                response['status'] = status.HTTP_409_CONFLICT
-               return Response(response)
          else:
             response['success'] = False
             response['message'] = "ERROR: No existe el evento"
             response['status'] = status.HTTP_409_CONFLICT
-            return Response(response)
+         return Response(response)
 
 class esParticipante(generics.ListAPIView):
    queryset = Usuario.objects.all()
@@ -193,22 +188,19 @@ class esParticipante(generics.ListAPIView):
                response['success'] = True
                response['message'] = "TRUE"
                response['status'] = status.HTTP_200_OK
-               return Response(response)
             else:
                response['success'] = False
                response['message'] = "FALSE"
                response['status'] = status.HTTP_200_OK
-               return Response(response)
          else:
             response['success'] = False
             response['message'] = "ERROR: No existe el evento"
             response['status'] = status.HTTP_409_CONFLICT
-            return Response(response)
       else:
          response['success'] = False
          response['message'] = "ERROR: No existe el usuario"
          response['status'] = status.HTTP_409_CONFLICT
-         return Response(response)
+      return Response(response)
 
 class eliminarParticipante(generics.ListAPIView):
    queryset = Evento.objects.all()
@@ -230,20 +222,59 @@ class eliminarParticipante(generics.ListAPIView):
                response['success'] = False
                response['message'] = "ERROR: No se ha borrado o no era participente del evento"
                response['status'] = status.HTTP_409_CONFLICT
-               return Response(response)
             else:
                usuario.numEventosParticipa = usuario.numEventosParticipa - 1
                response['success'] = True
                response['message'] = "Se ha borrado correctamente"
                response['status'] = status.HTTP_200_OK
-               return Response(response)
          else:
             response['success'] = False
             response['message'] = "ERROR: No existe el usuario"
             response['status'] = status.HTTP_409_CONFLICT
-            return Response(response)
       else:
          response['success'] = False
          response['message'] = "ERROR: No existe el evento"
          response['status'] = status.HTTP_409_CONFLICT
-         return Response(response)
+      return Response(response)
+
+#
+# MENSAJES
+#
+class createMensaje(generics.CreateAPIView):
+   queryset = Mensaje.objects.all()
+   serializer_class = MensajeSerializer
+
+   def post(self, request, *args, **kwargs):
+      response = {}
+      us = Usuario.objects.filter(username=request.data['autor'])
+      if(us):
+         us = Usuario.objects.get(username=request.data['autor'])
+         ev = Evento.objects.filter(nombre=request.data['evento'])
+         if(ev):
+            ev = Evento.objects.get(nombre=request.data['evento'])
+            Mensaje.objects.create(autor=us,evento=ev,texto=request.data['texto'])
+            response['success'] = True
+            response['message'] = "Mensaje guardado exitosamente"
+            response['status'] = status.HTTP_201_CREATED
+         else:
+            response['success'] = False
+            response['message'] = "ERROR: No existe el evento"
+            response['status'] = status.HTTP_409_CONFLICT
+      else:
+         response['success'] = False
+         response['message'] = "ERROR: No existe el usuario"
+         response['status'] = status.HTTP_409_CONFLICT
+      return Response(response)
+
+class listMensajes(generics.ListAPIView):
+    queryset = Mensaje.objects.all()
+    serializer_class = MensajeSerializer
+
+class listMensajeEventos(generics.ListAPIView):
+   queryset = Mensaje.objects.all()
+   serializer_class = MensajeSerializer
+
+   def get_queryset(self):
+      nomEvento=self.kwargs['nomEvento']
+      evento_id = Evento.objects.get(nombre=nomEvento)
+      return Mensaje.objects.filter(evento=evento_id)

@@ -112,8 +112,31 @@ def test_participantes(url):
     requests.delete(url + 'DeleteUsuario/user_prueba')
     print("-----------------------------------------------------\n")
 
+def test_mensajes(url):
+    print("-----------------------------------------------------\nTEST: MENSAJES")
+    auth_data_us = {'nombre': 'user_prueba', 'username': 'user_prueba', 'correo': 'prueba@gmail.com', 
+        'password': '1234'}
+    requests.post(url + 'CreateUsuario/', data=auth_data_us)
+    auth_data_ev = {'nombre': 'evento_prueba', 'descripcion': 'evento_prueba', 'fecha': '12/12/12', 
+        'hora': '12', 'aforo': 12, 'categoria': 'evento_prueba', 'organizador': 'user_prueba'}
+    requests.post(url + 'CreateEvento/', data=auth_data_ev)
+    requests.get(url + 'anadirParticipante/evento_prueba/user_prueba/')
+    mensaje_data_ev = {'autor': 'user_prueba', 'evento': 'evento_prueba', 'texto': 'mensaje1'}
+    requests.post(url + 'CreateMensaje/', data=mensaje_data_ev)
+    resp = requests.get(url + 'Mensajes/evento_prueba')
+    t = resp.json()
+    if ("user_prueba" in t[0]['autor']) & ("evento_prueba" in t[0]['evento']) & ("mensaje1" in t[0]['texto']):
+        print("\t -> CREACION DE UN MENSAJE--> FUNCIONA")
+    else:
+        print("\t -> CREACION DE UN MENSAJE --> NO FUNCIONA")
+    requests.delete(url + 'DeleteEvento/evento_prueba')
+    requests.delete(url + 'DeleteUsuario/user_prueba')
+    print("-----------------------------------------------------\n")
+
+        
 if __name__ == "__main__":
     pruebas = url_prueba
     test_usuarios(pruebas)
     test_eventos(pruebas)
     test_participantes(pruebas)
+    test_mensajes(pruebas)

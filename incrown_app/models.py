@@ -26,3 +26,10 @@ class Evento(models.Model):
     participantes = models.ManyToManyField(Usuario, related_name='usuario_apuntado_a')
     def __str__(self):
         return self.nombre
+
+class Mensaje(models.Model):
+    autor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='mensajes')
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE, related_name='mensajes')
+    texto = models.CharField(max_length=300)
+    def __str__(self):
+        return self.texto

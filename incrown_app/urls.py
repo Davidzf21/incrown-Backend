@@ -1,6 +1,8 @@
 from django.urls import include, path
 from .views import UsuarioCreate, UsuarioUpdate, UsuarioList, UsuariosList, UsuarioDelete
-from .views import EventoCreate, EventosList, EventoList, EventoListAll, EventoListUsuario, EventoUpdate, EventoDelete, anadirParticipante, eliminarParticipante, esParticipante
+from .views import EventoCreate, EventosList, EventoList, EventoListAll, EventoListUsuario, EventoUpdate, EventoDelete
+from .views import anadirParticipante, eliminarParticipante, esParticipante
+from .views import createMensaje, listMensajes, listMensajeEventos
 
 urlpatterns = [
     # USUARIOS
@@ -23,5 +25,10 @@ urlpatterns = [
     path('anadirParticipante/<str:nomEvento>/<str:nomUsuario>/', anadirParticipante.as_view()),
     path('esParticipante/<str:nomEvento>/<str:nomUsuario>/', esParticipante.as_view()),
     path('deleteParticipante/<str:nomEvento>/<str:nomUsuario>/', eliminarParticipante.as_view()),
+
+    # MENSAJES
+    path('CreateMensaje/', createMensaje.as_view()),
+    path('Mensajes/', listMensajes.as_view()),
+    path('Mensajes/<str:nomEvento>/', listMensajeEventos.as_view()),
 
 ]
