@@ -131,7 +131,7 @@ def test_mensajes(url):
         print("\t -> CREACION DE UN MENSAJE --> NO FUNCIONA")
     requests.delete(url + 'DeleteEvento/evento_prueba')
     requests.delete(url + 'DeleteUsuario/user_prueba')
-    print("-----------------------------------------------------\n")
+    print("-----------------------------------------------------\n") 
 
         
 if __name__ == "__main__":
