@@ -61,7 +61,28 @@ class UsuarioDelete(generics.RetrieveDestroyAPIView):
     lookup_field = 'username'
     serializer_class = UsuarioSerializer
 
-
+class Login(generics.ListAPIView):
+   queryset = Usuario.objects.all()
+   serializer_class = UsuarioSerializer
+   def list(self, request, *args, **kwargs):
+      response = {}
+      us = Usuario.objects.filter(username=self.kwargs['username'])
+      if(us):
+         us = Usuario.objects.get(username=self.kwargs['username'])
+         check = check_password(self.kwargs['contrasena'], us.password)
+         if(check):
+            response['success'] = True
+            response['message'] = "Contraseña correcta"
+            response['status'] = status.HTTP_200_OK
+         else:
+            response['success'] = False
+            response['message'] = "ERROR: Contraseña incorrecta"
+            response['status'] = status.HTTP_409_CONFLICT
+      else:
+         response['success'] = False
+         response['message'] = "ERROR: EL usuario no existe"
+         response['status'] = status.HTTP_409_CONFLICT
+      return Response(response)
 #
 # Funciones del EVENTO
 #
