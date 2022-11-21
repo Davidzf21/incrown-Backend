@@ -1,11 +1,6 @@
 from pickle import TRUE
 from django.test import TestCase
 import requests
-#from models import Usuario
-
-# Create your tests here.
-#factory = APIRequestFactory()
-#request = factory.post('/notes/', {'title': 'new idea'})
 
 url_prueba = 'http://127.0.0.1:8000/incrown_app/'
 url_web = 'https://incrown.onrender.com/incrown_app/'

@@ -57,9 +57,9 @@ class UsuarioList(generics.RetrieveAPIView):
 
 class UsuarioDelete(generics.RetrieveDestroyAPIView):
     # API endpoint that allows a Usuario record to be deleted
-    queryset = Usuario.objects.all()
-    lookup_field = 'username'
-    serializer_class = UsuarioSerializer
+   queryset = Usuario.objects.all()
+   lookup_field = 'username'
+   serializer_class = UsuarioSerializer
 
 class Login(generics.ListAPIView):
    queryset = Usuario.objects.all()
@@ -83,6 +83,18 @@ class Login(generics.ListAPIView):
          response['message'] = "ERROR: EL usuario no existe"
          response['status'] = status.HTTP_409_CONFLICT
       return Response(response)
+
+class ValorarUsuario(generics.RetrieveUpdateAPIView):
+    # API endpoint that allows a Usuario record to be updated.
+    queryset = Usuario.objects.all()
+    lookup_field = 'username'
+    serializer_class = UsuarioSerializer
+    def put(self, request, *args, **kwargs):
+        usuario = Usuario.objects.get(username=self.kwargs['username'])
+        request.data['numValoraciones'] = usuario.numValoraciones + 1
+        request.data['valoracion'] = ((usuario.valoracion*(usuario.numValoraciones))+request.data['valoracion'])/request.data['numValoraciones']
+        return self.partial_update(request, *args, **kwargs)
+      
 #
 # Funciones del EVENTO
 #
@@ -257,6 +269,199 @@ class eliminarParticipante(generics.ListAPIView):
          response['message'] = "ERROR: No existe el evento"
          response['status'] = status.HTTP_409_CONFLICT
       return Response(response)
+
+class eventosApuntados(generics.ListAPIView):
+   queryset = Evento.objects.all()
+   serializer_class = EventoSerializer
+
+   def list(self, request, *args, **kwargs):
+      nomUsuario=self.kwargs['nomUsuario']
+      usuario = Usuario.objects.filter(username=nomUsuario)
+      if(usuario):
+         usuario = Usuario.objects.get(username=nomUsuario)
+         queryset = Evento.objects.filter(participantes=usuario)
+         page = self.paginate_queryset(queryset)
+         if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+         else:
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+      else:
+         # RESPONSE
+         response={}
+         response['success'] = False
+         response['message'] = "Username no existe"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+         return Response(response)
+
+class eventosNoApuntados(generics.ListAPIView):
+   queryset = Evento.objects.all()
+   serializer_class = EventoSerializer
+
+   def list(self, request, *args, **kwargs):
+      nomUsuario=self.kwargs['nomUsuario']
+      usuario = Usuario.objects.filter(username=nomUsuario)
+      if(usuario):
+         usuario = Usuario.objects.get(username=nomUsuario)
+         queryset = Evento.objects.exclude(participantes=usuario)
+         page = self.paginate_queryset(queryset)
+         if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+         serializer = self.get_serializer(queryset, many=True)
+         return Response(serializer.data)
+      else:
+         # RESPONSE
+         response={}
+         response['success'] = False
+         response['message'] = "Username no existe"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+         return Response(response)
+
+
+#
+# AMIGOS
+#
+class anadirAmigo(generics.ListAPIView):
+   queryset = Usuario.objects.all()
+   serializer_class = UsuarioSerializer
+
+   def list(self, request, *args, **kwargs):
+      nomAmigo=self.kwargs['nomAmigo']
+      nomUsuario=self.kwargs['nomUsuario']
+      response = {}
+      usuario = Usuario.objects.filter(username=nomUsuario)
+      if(usuario):
+         usuario = Usuario.objects.get(username=nomUsuario)
+         amigo = Usuario.objects.filter(username=nomAmigo)
+         if(amigo):
+            amigo = Usuario.objects.get(username=nomAmigo)
+            beforeInsert = Usuario.objects.filter(amigos=amigo).count()
+            usuario.amigos.add(amigo)
+            afterInsert = Usuario.objects.filter(amigos=amigo).count()
+            if  beforeInsert == afterInsert:
+               # RESPONSE
+               response['success'] = False
+               response['message'] = "ERROR: Ya son amigos estos usuarios"
+               response['status'] = status.HTTP_400_BAD_REQUEST
+            else:
+               # RESPONSE
+               response['success'] = True
+               response['message'] = "Amigo añadido correctamente"
+               response['status'] = status.HTTP_200_OK
+         else:
+            # RESPONSE
+            response['success'] = False
+            response['message'] = "Amigo no existe"
+            response['status'] = status.HTTP_400_BAD_REQUEST
+      else:
+            # RESPONSE
+            response['success'] = False
+            response['message'] = "Username no existe"
+            response['status'] = status.HTTP_400_BAD_REQUEST
+      return Response(response)
+
+class esAmigo(generics.ListAPIView):
+   queryset = Usuario.objects.all()
+   serializer_class = UsuarioSerializer
+
+   def list(self, request, *args, **kwargs):
+      nomUsuario=self.kwargs['nomUsuario']
+      nomAmigo=self.kwargs['nomAmigo']
+      response={}
+      amigo = Usuario.objects.filter(username=nomAmigo)
+      if(amigo):
+         amigo = Usuario.objects.get(username=nomAmigo)
+         num = Usuario.objects.filter(username=nomAmigo)
+         if(num):
+            num = Usuario.objects.filter(amigos=amigo)
+            num = num.filter(username=nomUsuario)
+            if  num:
+               # RESPONSE
+               response['success'] = True
+               response['message'] = "Son amigos"
+               response['status'] = status.HTTP_200_OK
+            else:
+               # RESPONSE
+               response['success'] = False
+               response['message'] = "No son amigos"
+               response['status'] = status.HTTP_200_OK
+         else:
+            # RESPONSE
+            response['success'] = False
+            response['message'] = "Amigo no existe"
+            response['status'] = status.HTTP_400_BAD_REQUEST
+      else:
+         # RESPONSE
+         response['success'] = False
+         response['message'] = "Username no existe"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+      return Response(response)
+
+class amigosUsuario(generics.ListAPIView):
+   queryset = Usuario.objects.all()
+   serializer_class = UsuarioSerializer
+
+   def list(self, request, *args, **kwargs):
+      nomUsuario=self.kwargs['nomUsuario']
+      usuario = Usuario.objects.filter(username=nomUsuario)
+      if(usuario):
+         usuario = Usuario.objects.get(username=nomUsuario)
+         queryset = usuario.amigos.all()
+         page = self.paginate_queryset(queryset)
+         if page is not None:
+               serializer = self.get_serializer(page, many=True)
+               return self.get_paginated_response(serializer.data)
+         serializer = self.get_serializer(queryset, many=True)
+         return Response(serializer.data)
+      else:
+         # RESPONSE
+         response={}
+         response['success'] = False
+         response['message'] = "Username no existe"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+         return Response(response)
+
+class deleteAmigo(generics.ListAPIView):
+   queryset = Usuario.objects.all()
+   serializer_class = UsuarioSerializer
+
+   def list(self, request, *args, **kwargs):
+      nomAmigo=self.kwargs['nomAmigo']
+      nomUsuario=self.kwargs['nomUsuario']
+      response = {}
+      usuario = Usuario.objects.filter(username=nomUsuario)
+      if(usuario):
+         usuario = Usuario.objects.get(username=nomUsuario)
+         amigo = Usuario.objects.filter(username=nomAmigo)
+         if(amigo):
+            amigo = Usuario.objects.get(username=nomAmigo)
+            beforeInsert = Usuario.objects.filter(amigos=amigo).count()
+            usuario.amigos.remove(amigo)
+            afterInsert = Usuario.objects.filter(amigos=amigo).count()
+            if  beforeInsert == afterInsert:
+               # RESPONSE
+               response['success'] = False
+               response['message'] = "ERROR: No eran amigos estos usuarios"
+               response['status'] = status.HTTP_400_BAD_REQUEST
+            else:
+               # RESPONSE
+               response['success'] = True
+               response['message'] = "Amigo borrado correctamente"
+               response['status'] = status.HTTP_200_OK
+         else:
+            # RESPONSE
+            response['success'] = False
+            response['message'] = "Amigo no existe"
+            response['status'] = status.HTTP_400_BAD_REQUEST
+      else:
+            # RESPONSE
+            response['success'] = False
+            response['message'] = "Username no existe"
+            response['status'] = status.HTTP_400_BAD_REQUEST
+      return Response(response)
+
 
 #
 # MENSAJES
