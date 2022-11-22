@@ -1,5 +1,5 @@
 from django.urls import include, path
-from .views import UsuarioCreate, UsuarioUpdate, UsuarioList, UsuariosList, UsuarioDelete, Login, ValorarUsuario
+from .views import UsuarioCreate, UsuarioUpdate, UsuarioList, UsuariosList, UsuarioDelete, Login, ValorarUsuario, RecuperarContrasena
 from .views import EventoCreate, EventosList, EventoList, EventoListAll, EventoListUsuario, EventoUpdate, EventoDelete, eventosApuntados, eventosNoApuntados
 from .views import anadirParticipante, eliminarParticipante, esParticipante
 from .views import anadirAmigo, esAmigo, amigosUsuario, deleteAmigo
@@ -14,6 +14,7 @@ urlpatterns = [
     path('DeleteUsuario/<str:username>/', UsuarioDelete.as_view(), name='delete-usuario'),
     path('Login/<str:username>/<str:contrasena>', Login.as_view(), name='login-usuario'),
     path('valorarUsuario/<str:username>/', ValorarUsuario.as_view(), name='valorar-usuario'),
+    path('enviarCorreo/<str:correo>/', RecuperarContrasena.as_view(), name='enviar-correo'),
 
     # EVENTOS
     path('CreateEvento/', EventoCreate.as_view(), name='create-evento'),

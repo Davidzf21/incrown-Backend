@@ -4,6 +4,10 @@ from rest_framework.response import Response
 from .models import Usuario, Evento, Mensaje
 from .serializers import EventoSerializerAll, UsuarioSerializer, EventoSerializer, MensajeSerializer
 from django.contrib.auth.hashers import make_password, check_password
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+import string, random
 
 #
 # Funciones del USUARIO
@@ -95,6 +99,61 @@ class ValorarUsuario(generics.RetrieveUpdateAPIView):
         request.data['valoracion'] = ((usuario.valoracion*(usuario.numValoraciones))+request.data['valoracion'])/request.data['numValoraciones']
         return self.partial_update(request, *args, **kwargs)
       
+class RecuperarContrasena(generics.RetrieveAPIView):
+   queryset = Usuario.objects.all()
+   serializer_class = UsuarioSerializer
+   lookup_field = 'correo'
+
+   def get(self, request, *args, **kwargs):
+      
+      response={}
+      usuario = Usuario.objects.filter(correo=self.kwargs['correo'])
+      if(usuario):
+         # Generar una contraseña aleatoria nueva
+         contrasena = ''
+         length_of_string = 8
+         for x in range(length_of_string):
+            contrasena = contrasena + random.choice(string.ascii_letters)
+         
+         # Guardar la nueva contraseña en los datos del usuario
+         usuario = Usuario.objects.get(correo=self.kwargs['correo'])
+         usuario.password = make_password(contrasena)
+         usuario.save()
+
+         # Enviar la nueva contraseña al correo electronico del usuario
+         email = self.kwargs['correo']
+         contrasenya = str(contrasena)
+         html = '<h1>Su contraseña es -> '+contrasenya+'</h1>'
+         mail = MIMEMultipart('alternative')
+         mail['From'] = 'univibesunizar1234@gmail.com'
+         mail['To'] = email
+         mail['Cc'] = ''
+         mail['Subject'] = 'Su contraseña es '+contrasenya
+         part2 = MIMEText(html, 'html')
+         mail.attach(part2)
+         msg_full = mail.as_string().encode()
+         server = smtplib.SMTP('smtp.gmail.com', 587)
+         server.starttls()
+         #Contraseña generada por Google para poder enviar correos -> njcncdvsswrmtzmw
+         #Contraseña de la cuenta -> 1234univibesunizar
+         server.login('univibesunizar1234@gmail.com', 'njcncdvsswrmtzmw')
+         server.sendmail('univibesunizar1234@gmail.com', email, msg_full)
+         server.quit()
+
+         # RESPONSE
+         response['success'] = True
+         response['message'] = "Coreo enviado correctamente"
+         response['status'] = status.HTTP_200_OK
+      else:
+         # RESPONSE
+         response['success'] = False
+         response['message'] = "ERROR: No existe un usuario con el ese correo"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+      return Response(response)
+      
+
+
+
 #
 # Funciones del EVENTO
 #
