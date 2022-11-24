@@ -37,18 +37,15 @@ class UsuarioCreate(generics.CreateAPIView):
          return Response(response)
 
 class UsuarioUpdate(generics.RetrieveUpdateAPIView):
-   queryset = Usuario.objects.all()
-   lookup_field = 'username'
-   serializer_class = UsuarioSerializer
-   def put(self, request, *args, **kwargs):
-      us = Usuario.objects.get(username=self.kwargs['username'])
-      if request.data['password'] == us.password:
-         return self.partial_update(request, *args, **kwargs)
-      else:
-         request.data._mutable = True
-         request.data['password'] = make_password(request.data["password"])
-         request.data._mutable = False
-         return self.partial_update(request, *args, **kwargs) 
+   # API endpoint that allows a Usuario record to be updated.
+    queryset = Usuario.objects.all()
+    lookup_field = 'id'
+    serializer_class = UsuarioSerializer
+    def put(self, request, *args, **kwargs):
+      request.data._mutable = True
+      request.data['password'] = make_password(request.data["password"])
+      request.data._mutable = False 
+      self.partial_update(request, *args, **kwargs)
 
 class UsuariosList(generics.ListAPIView):
    queryset = Usuario.objects.all()
@@ -80,7 +77,7 @@ class UsuarioDelete(generics.ListAPIView):
          else:
             # RESPONSE
             response['success'] = True
-            response['message'] = "Usuario eliminado correctamente"
+            response['message'] = "Usuario eliminado"
             response['status'] = status.HTTP_200_OK
       else:
             # RESPONSE
