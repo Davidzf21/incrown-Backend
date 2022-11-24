@@ -39,7 +39,7 @@ class UsuarioCreate(generics.CreateAPIView):
 class UsuarioUpdate(generics.RetrieveUpdateAPIView):
    # API endpoint that allows a Usuario record to be updated.
     queryset = Usuario.objects.all()
-    lookup_field = 'id'
+    lookup_field = 'username'
     serializer_class = UsuarioSerializer
     def put(self, request, *args, **kwargs):
       request.data._mutable = True
