@@ -59,11 +59,35 @@ class UsuarioList(generics.RetrieveAPIView):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
 
-class UsuarioDelete(generics.RetrieveDestroyAPIView):
-    # API endpoint that allows a Usuario record to be deleted
+class UsuarioDelete(generics.ListAPIView):
    queryset = Usuario.objects.all()
-   lookup_field = 'username'
    serializer_class = UsuarioSerializer
+
+   def list(self, request, *args, **kwargs):
+      nomUsuario=self.kwargs['username']
+      response = {}
+      usuario = Usuario.objects.filter(username=nomUsuario)
+      if(usuario):
+         usuario = Usuario.objects.get(username=nomUsuario)
+         beforeDelete = Usuario.objects.count()
+         usuario.delete()
+         afterDelete = Usuario.objects.count()
+         if  beforeDelete == afterDelete:
+            # RESPONSE
+            response['success'] = False
+            response['message'] = "ERROR: No se han podido eliminar el usuario"
+            response['status'] = status.HTTP_400_BAD_REQUEST
+         else:
+            # RESPONSE
+            response['success'] = True
+            response['message'] = "Usuario eliminado correctamente"
+            response['status'] = status.HTTP_200_OK
+      else:
+            # RESPONSE
+            response['success'] = False
+            response['message'] = "Username no existe"
+            response['status'] = status.HTTP_400_BAD_REQUEST
+      return Response(response)
 
 class Login(generics.ListAPIView):
    queryset = Usuario.objects.all()
@@ -128,7 +152,7 @@ class RecuperarContrasena(generics.RetrieveAPIView):
          mail['From'] = 'univibesunizar1234@gmail.com'
          mail['To'] = email
          mail['Cc'] = ''
-         mail['Subject'] = 'Su contraseña es '+contrasenya
+         mail['Subject'] = 'Su nueva contraseña es '+contrasenya
          part2 = MIMEText(html, 'html')
          mail.attach(part2)
          msg_full = mail.as_string().encode()
@@ -142,7 +166,7 @@ class RecuperarContrasena(generics.RetrieveAPIView):
 
          # RESPONSE
          response['success'] = True
-         response['message'] = "Coreo enviado correctamente"
+         response['message'] = "Correo enviado correctamente"
          response['status'] = status.HTTP_200_OK
       else:
          # RESPONSE
@@ -151,8 +175,6 @@ class RecuperarContrasena(generics.RetrieveAPIView):
          response['status'] = status.HTTP_400_BAD_REQUEST
       return Response(response)
       
-
-
 
 #
 # Funciones del EVENTO
