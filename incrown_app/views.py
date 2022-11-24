@@ -36,16 +36,31 @@ class UsuarioCreate(generics.CreateAPIView):
             response['status'] = status.HTTP_201_CREATED
          return Response(response)
 
-class UsuarioUpdate(generics.RetrieveUpdateAPIView):
-   # API endpoint that allows a Usuario record to be updated.
+class UsuarioUpdate(generics.ListAPIView):
+   # API endpoint that allows creation of a new Usuario
     queryset = Usuario.objects.all()
-    lookup_field = 'username'
     serializer_class = UsuarioSerializer
-    def put(self, request, *args, **kwargs):
-      request.data._mutable = True
-      request.data['password'] = make_password(request.data["password"])
-      request.data._mutable = False 
-      self.partial_update(request, *args, **kwargs)
+    def list(self, request, *args, **kwargs):
+         response = {}
+         us = Usuario.objects.filter(username=self.kwargs['username'])
+         if (us):
+            us = Usuario.objects.get(username=self.kwargs['username'])
+            us.nombre = request.data.get("nombre")
+            us.username = request.data.get("username")
+            us.correo = request.data.get("correo")
+            us.pasword = make_password(request.data.get("password"))
+            us.save()
+            #Usuario.objects.update(nombre=nombre,username=username,correo=correo, password=pasword)
+            # RESPONSE
+            response['success'] = True
+            response['message'] = "Usuario modificado exitosamente"
+            response['status'] = status.HTTP_201_CREATED
+         else:
+            # RESPONSE
+            response['success'] = False
+            response['message'] = "Username no existe"
+            response['status'] = status.HTTP_400_BAD_REQUEST
+         return Response(response)
 
 class UsuariosList(generics.ListAPIView):
    queryset = Usuario.objects.all()
