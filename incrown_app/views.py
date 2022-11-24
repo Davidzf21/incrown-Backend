@@ -40,7 +40,7 @@ class UsuarioUpdate(generics.ListAPIView):
    # API endpoint that allows creation of a new Usuario
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
-    def list(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
          response = {}
          us = Usuario.objects.filter(username=self.kwargs['username'])
          if (us):
