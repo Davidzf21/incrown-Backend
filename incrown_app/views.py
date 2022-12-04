@@ -101,6 +101,26 @@ class UsuarioDelete(generics.ListAPIView):
             response['status'] = status.HTTP_400_BAD_REQUEST
       return Response(response)
 
+class UsuarioDeleteAll(generics.ListAPIView):
+   queryset = Usuario.objects.all()
+   serializer_class = UsuarioSerializer
+
+   def list(self, request, *args, **kwargs):
+      response = {}
+      Usuario.objects.all().delete()
+      n = Usuario.objects.count()
+      if  n == 0:
+         # RESPONSE
+         response['success'] = True
+         response['message'] = "Borrado todos los usuarios"
+         response['status'] = status.HTTP_200_OK
+      else:
+         # RESPONSE
+         response['success'] = False
+         response['message'] = "ERROR: No se han podido eliminar todos los usuarios"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+      return Response(response)
+
 class Login(generics.ListAPIView):
    queryset = Usuario.objects.all()
    serializer_class = UsuarioSerializer
@@ -257,6 +277,25 @@ class EventoDelete(generics.RetrieveDestroyAPIView):
    lookup_field = 'nombre'
    serializer_class = EventoSerializer
 
+class EventoDeleteAll(generics.ListAPIView):
+   queryset = Evento.objects.all()
+   serializer_class = EventoSerializer
+
+   def list(self, request, *args, **kwargs):
+      response = {}
+      Evento.objects.all().delete()
+      n = Evento.objects.count()
+      if  n == 0:
+         # RESPONSE
+         response['success'] = True
+         response['message'] = "Borrado todos los eventos"
+         response['status'] = status.HTTP_200_OK
+      else:
+         # RESPONSE
+         response['success'] = False
+         response['message'] = "ERROR: No se han podido eliminar todos los eventos"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+      return Response(response)
 
 #
 # PARTICIANTES
@@ -597,3 +636,30 @@ class listMensajeEventos(generics.ListAPIView):
       nomEvento=self.kwargs['nomEvento']
       evento_id = Evento.objects.get(nombre=nomEvento)
       return Mensaje.objects.filter(evento=evento_id)
+
+class DeleteAll(generics.ListAPIView):
+   queryset = Evento.objects.all()
+   serializer_class = EventoSerializer
+
+   def list(self, request, *args, **kwargs):
+      response = {}
+      Evento.objects.all().delete()
+      Usuario.objects.all().delete()
+      ne = Evento.objects.count()
+      nu = Usuario.objects.count()
+      if  ne != 0:
+         # RESPONSE
+         response['success'] = False
+         response['message'] = "ERROR: No se han borrado todos los eventos"
+         response['status'] = status.HTTP_200_OK
+      elif nu != 0:
+         # RESPONSE
+         response['success'] = False
+         response['message'] = "ERROR: No se han borrado todos los usuarios"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+      else:
+         # RESPONSE
+         response['success'] = True
+         response['message'] = "Se han borrado todos los datos del sistema"
+         response['status'] = status.HTTP_200_OK
+      return Response(response)

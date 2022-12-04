@@ -1,9 +1,10 @@
 from django.urls import include, path
-from .views import UsuarioCreate, UsuarioUpdate, UsuarioList, UsuariosList, UsuarioDelete, Login, ValorarUsuario, RecuperarContrasena
-from .views import EventoCreate, EventosList, EventoList, EventoListAll, EventoListUsuario, EventoUpdate, EventoDelete, eventosApuntados, eventosNoApuntados
+from .views import UsuarioCreate, UsuarioUpdate, UsuarioList, UsuariosList, UsuarioDelete, Login, ValorarUsuario, RecuperarContrasena, UsuarioDeleteAll
+from .views import EventoCreate, EventosList, EventoList, EventoListAll, EventoListUsuario, EventoUpdate, EventoDelete, eventosApuntados, eventosNoApuntados, EventoDeleteAll
 from .views import anadirParticipante, eliminarParticipante, esParticipante
 from .views import anadirAmigo, esAmigo, amigosUsuario, deleteAmigo
 from .views import createMensaje, listMensajes, listMensajeEventos
+from .views import DeleteAll
 
 urlpatterns = [
     # USUARIOS
@@ -12,6 +13,7 @@ urlpatterns = [
     path('Usuarios/', UsuariosList.as_view(), name='list-usuarios'),
     path('Usuario/<str:username>/', UsuarioList.as_view(), name='list-usuario'),
     path('DeleteUsuario/<str:username>/', UsuarioDelete.as_view(), name='delete-usuario'),
+    path('DeleteAllUsuarios/', UsuarioDeleteAll.as_view(), name='delete-usuarios'),
     path('Login/<str:username>/<str:contrasena>', Login.as_view(), name='login-usuario'),
     path('valorarUsuario/<str:username>/', ValorarUsuario.as_view(), name='valorar-usuario'),
     path('enviarCorreo/<str:correo>/', RecuperarContrasena.as_view(), name='enviar-correo'),
@@ -24,6 +26,8 @@ urlpatterns = [
     path('EventosAll/', EventoListAll.as_view()),
     path('UpdateEvento/<str:nombre>/', EventoUpdate.as_view(), name='update-evento'),
     path('DeleteEvento/<str:nombre>/', EventoDelete.as_view(), name='delete-evento'),
+    path('DeleteAllEventos/', EventoDeleteAll.as_view(), name='delete-usuarios'),
+
 
     # PARTICIPANTES
     path('anadirParticipante/<str:nomEvento>/<str:nomUsuario>/', anadirParticipante.as_view()),
@@ -43,4 +47,6 @@ urlpatterns = [
     path('Mensajes/', listMensajes.as_view()),
     path('Mensajes/<str:nomEvento>/', listMensajeEventos.as_view()),
 
+    # ALL
+    path('DeleteAll/', DeleteAll.as_view()),
 ]
