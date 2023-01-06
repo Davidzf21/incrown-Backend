@@ -328,6 +328,23 @@ class EventoDeleteAll(generics.ListAPIView):
 #
 # PARTICIANTES
 #
+class participantes(generics.ListAPIView):
+    # API endpoint that allows Evento to be viewed.
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+
+    def list(self, request, *args, **kwargs):
+        
+        ev = Evento.objects.get(nombre=self.kwargs['evento'])
+        queryset = ev.participantes        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+
 class anadirParticipante(generics.ListAPIView):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer

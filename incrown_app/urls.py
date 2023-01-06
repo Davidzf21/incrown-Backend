@@ -1,7 +1,7 @@
 from django.urls import include, path
 from .views import UsuarioCreate, UsuarioUpdate, UsuarioList, UsuariosList, UsuarioDelete, Login, ValorarUsuario, RecuperarContrasena, UsuarioDeleteAll
 from .views import EventoCreate, EventosList, EventosListRandom, EventoList, EventoListAll, EventoListUsuario, EventoUpdate, EventoDelete, eventosApuntados, eventosNoApuntados, EventoDeleteAll
-from .views import anadirParticipante, eliminarParticipante, esParticipante
+from .views import anadirParticipante, participantes, eliminarParticipante, esParticipante
 from .views import anadirAmigo, esAmigo, amigosUsuario, deleteAmigo
 from .views import createMensaje, listMensajes, listMensajeEventos
 from .views import DeleteAll
@@ -31,6 +31,7 @@ urlpatterns = [
 
 
     # PARTICIPANTES
+    path('participantes/<str:evento>/', participantes.as_view(), name='participantes'),
     path('anadirParticipante/<str:nomEvento>/<str:nomUsuario>/', anadirParticipante.as_view()),
     path('esParticipante/<str:nomEvento>/<str:nomUsuario>/', esParticipante.as_view()),
     path('deleteParticipante/<str:nomEvento>/<str:nomUsuario>/', eliminarParticipante.as_view()),
