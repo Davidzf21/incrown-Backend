@@ -90,6 +90,8 @@ class UsuarioDelete(generics.ListAPIView):
             response['message'] = "ERROR: No se han podido eliminar el usuario"
             response['status'] = status.HTTP_400_BAD_REQUEST
          else:
+            eventos = Evento.objects.filter(organizador = nomUsuario)
+            eventos.delete()
             # RESPONSE
             response['success'] = True
             response['message'] = "Usuario eliminado"
@@ -241,6 +243,32 @@ class EventoCreate(generics.CreateAPIView):
 class EventosList(generics.ListAPIView):
    queryset = Evento.objects.all()
    serializer_class = EventoSerializer
+
+class EventosListRandom(generics.ListAPIView):
+   queryset = Evento.objects.all()
+   serializer_class = EventoSerializer
+
+   def list(self, request, *args, **kwargs):
+      nomUsuario=self.kwargs['username']
+      usuario = Usuario.objects.filter(username=nomUsuario)
+      if(usuario):
+         usuario = Usuario.objects.get(username=nomUsuario)
+         a = Evento.objects.exclude(organizador=nomUsuario)
+         queryset = list(a.exclude(participantes = usuario))
+         numMax = len(queryset)
+         if numMax > 10:
+            numMax = 10
+         # change numMax to how many random items you want
+         random_items = random.sample(queryset, numMax)
+         serializer = EventoSerializer(random_items, many=True)
+         return Response(serializer.data)
+      else:
+         # RESPONSE
+         response={}
+         response['success'] = False
+         response['message'] = "Username no existe"
+         response['status'] = status.HTTP_400_BAD_REQUEST
+         return Response(response)
 
 class EventoList(generics.RetrieveAPIView):
     lookup_field = 'nombre'
