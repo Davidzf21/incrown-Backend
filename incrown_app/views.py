@@ -50,8 +50,8 @@ class UsuarioUpdate(generics.ListAPIView):
             #us.correo = request.data.get("correo")
             #us.pasword = request.data.get("password")
             #us.save()
-            Usuario.objects.update(nombre=request.data.get("nombre"),correo=request.data.get("correo"), 
-               password= make_password(request.data.get("password")))
+            Usuario.objects.update(nombre=request.data.get("nombre"), username = self.kwargs['username']
+               ,correo=request.data.get("correo"), password= make_password(request.data.get("password")))
             # RESPONSE
             response['success'] = True
             response['message'] = "Usuario modificado exitosamente"
