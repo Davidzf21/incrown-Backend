@@ -18,6 +18,7 @@ def incrementar_numExitoPruebas():
 # TEST USUARIOS
 def test_usuarios(url):
     print("-----------------------------------------------------\nTEST: USUARIOS")
+    requests.get(url + 'DeleteAll')
     #Creacion Buena
     auth_data = {'nombre': 'prueba', 'username': 'prueba', 'correo': 'prueba@gmail.com', 'password': '1234'}
     requests.post(url + 'CreateUsuario/', data=auth_data)
@@ -42,7 +43,7 @@ def test_usuarios(url):
     # Modificacion Buena
     incrementar_numPruebas()
     auth_data = {'nombre': 'prueba1', 'username': 'prueba', 'correo': 'prueba1@gmail.com', 'password': '12345'}
-    requests.put(url + 'UpdateUsuario/prueba/', data=auth_data)
+    requests.post(url + 'UpdateUsuario/prueba/', data=auth_data)
     resp = requests.get(url + 'Usuario/prueba')
     t = resp.json()
     if ("prueba1" in t['nombre']) & ("prueba1@gmail.com" in t['correo']):
@@ -79,19 +80,18 @@ def test_usuarios(url):
         print("\t -> LOGIN DE CONTRASEÑA INCORRECTA --> NO FUNCIONA")
     # Eliminacion Buena
     incrementar_numPruebas()
-    requests.delete(url + 'DeleteUsuario/prueba')
-    resp = requests.get(url + 'Usuario/prueba')
+    resp = requests.get(url + 'DeleteUsuario/prueba')
     t = resp.json()
-    if "Not found." in t['detail']:
+    if "Usuario eliminado" in t['message']:
         incrementar_numExitoPruebas()
         print("\t -> ELIMINACION DE UN USUARIO --> FUNCIONA")
     else:
         print("\t -> ELIMINACION DE UN USUARIO --> NO FUNCIONA")
     # Eliminacion Mala
     incrementar_numPruebas()
-    resp = requests.delete(url + 'DeleteUsuario/prueba1')
+    resp = requests.get(url + 'DeleteUsuario/prueba1')
     t = resp.json()
-    if "Not found." in t['detail']:
+    if "Username no existe" in t['message']:
         incrementar_numExitoPruebas()
         print("\t -> ELIMINACION DE UN USUARIO NO EXISTENTE --> FUNCIONA")
     else:
@@ -150,7 +150,7 @@ def test_eventos(url):
     requests.delete(url + 'DeleteUsuario/evento_prueba')
     # Eliminacion Mala
     incrementar_numPruebas()
-    res = requests.delete(url + 'DeleteEvento/evento_prueba2')
+    resp = requests.delete(url + 'DeleteEvento/evento_prueba2')
     t = resp.json()
     if "Not found." in t['detail']:
         incrementar_numExitoPruebas()
@@ -158,6 +158,7 @@ def test_eventos(url):
     else:
         print("\t -> ELIMINACION DE UN USUARIO NO EXISTENTE --> NO FUNCIONA")
     requests.delete(url + 'DeleteUsuario/evento_prueba')
+    requests.get(url + 'DeleteAll')
     print("-----------------------------------------------------\n")
 
 # TEST PARTICIPANTES
@@ -294,14 +295,12 @@ def test_participantes(url):
     incrementar_numPruebas()
     resp = requests.get(url + 'eventosNoApuntados/user_prueba/')
     t = resp.json()
-    if not "evento_prueba" in t[0]['nombre']:
+    if len(t) == 0:
         incrementar_numExitoPruebas()
         print("\t -> EVENTOS EN LOS QUE NO PARTICIPA UN USUARIO --> FUNCIONA")
     else:
         print("\t -> EVENTOS EN LOS QUE NO PARTICIPA UN USUARIO --> NO FUNCIONA")
-    requests.delete(url + 'DeleteEvento/evento_prueba')
-    requests.delete(url + 'DeleteUsuario/user_prueba')
-    requests.delete(url + 'DeleteUsuario/user_prueba1')
+    requests.get(url + 'DeleteAll')
     print("-----------------------------------------------------\n")
 
 # TEST MENSAJES
@@ -325,8 +324,15 @@ def test_mensajes(url):
         print("\t -> CREACION DE UN MENSAJE--> FUNCIONA")
     else:
         print("\t -> CREACION DE UN MENSAJE --> NO FUNCIONA")
-    requests.delete(url + 'DeleteEvento/evento_prueba')
-    requests.delete(url + 'DeleteUsuario/user_prueba')
+    requests.get(url + 'DeleteAll')
+    resp = requests.get(url + 'Mensajes/')
+    t = resp.json()
+    if len(t) == 0:
+        incrementar_numExitoPruebas()
+        print("\t -> MENSAJES BORRADOS CUANDO SE BORRA EL EVENTO --> FUNCIONA")
+    else:
+        print("\t -> MENSAJES BORRADOS CUANDO SE BORRA EL EVENTO --> NO FUNCIONA")
+    requests.get(url + 'DeleteAll')
     print("-----------------------------------------------------\n") 
 
         
