@@ -44,13 +44,14 @@ class UsuarioUpdate(generics.ListAPIView):
          response = {}
          us = Usuario.objects.filter(username=self.kwargs['username'])
          if (us):
-            us = Usuario.objects.get(username=self.kwargs['username'])
-            us.nombre = request.data.get("nombre")
-            us.username = request.data.get("username")
-            us.correo = request.data.get("correo")
-            us.pasword = make_password(request.data.get("password"))
-            us.save()
-            #Usuario.objects.update(nombre=nombre,username=username,correo=correo, password=pasword)
+            #us = Usuario.objects.get(username=self.kwargs['username'])
+            #us.nombre = request.data.get("nombre")
+            #us.username = request.data.get("username")
+            #us.correo = request.data.get("correo")
+            #us.pasword = request.data.get("password")
+            #us.save()
+            Usuario.objects.update(nombre=request.data.get("nombre"),correo=request.data.get("correo"), 
+               password= make_password(request.data.get("password")))
             # RESPONSE
             response['success'] = True
             response['message'] = "Usuario modificado exitosamente"
