@@ -44,18 +44,28 @@ class UsuarioUpdate(generics.ListAPIView):
          response = {}
          us = Usuario.objects.filter(username=self.kwargs['username'])
          if (us):
-            #us = Usuario.objects.get(username=self.kwargs['username'])
-            #us.nombre = request.data.get("nombre")
-            #us.username = request.data.get("username")
-            #us.correo = request.data.get("correo")
-            #us.pasword = request.data.get("password")
-            #us.save()
-            Usuario.objects.update(nombre=request.data.get("nombre"), username = self.kwargs['username']
-               ,correo=request.data.get("correo"), password= make_password(request.data.get("password")))
-            # RESPONSE
-            response['success'] = True
-            response['message'] = "Usuario modificado exitosamente"
-            response['status'] = status.HTTP_201_CREATED
+            usc = Usuario.objects.filter(correo=request.data.get("correo"))
+            if (usc):
+               # RESPONSE
+               response['success'] = False
+               response['message'] = "Correo introducido ya existe en el sistema"
+               response['status'] = status.HTTP_400_BAD_REQUEST
+            else:
+               Usuario.objects.filter(username = self.kwargs['username']).update(
+                  nombre=request.data.get("nombre"),correo=request.data.get("correo"), 
+                  password= make_password(request.data.get("password")))
+               #us = Usuario.objects.get(username=self.kwargs['username'])
+               #us.nombre = request.data.get("nombre")
+               #us.username = request.data.get("username")
+               #us.correo = request.data.get("correo")
+               #us.pasword = request.data.get("password")
+               #us.save()
+               #Usuario.objects.update(nombre=request.data.get("nombre"), username = self.kwargs['username']
+                  #,correo=request.data.get("correo"), password= make_password(request.data.get("password")))
+               # RESPONSE
+               response['success'] = True
+               response['message'] = "Usuario modificado exitosamente"
+               response['status'] = status.HTTP_201_CREATED
          else:
             # RESPONSE
             response['success'] = False
