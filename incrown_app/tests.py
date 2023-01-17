@@ -54,8 +54,9 @@ def test_usuarios(url):
     # Modificacion Mala
     incrementar_numPruebas()
     auth_data = {'nombre': 'prueba1', 'username': 'prueba', 'correo': 'prueba1@gmail.com', 'password': '12345'}
-    resp = requests.put(url + 'UpdateUsuario/prueba1/', data=auth_data)
-    if (resp.status_code == 500):
+    resp = requests.post(url + 'UpdateUsuario/prueba1/', data=auth_data)
+    t = resp.json()
+    if ("Username no existe" in t['message']):
         incrementar_numExitoPruebas()
         print("\t -> NO MODIFICACION DE UN USUARIO NO EXISTENTE --> FUNCIONA")
     else:
@@ -325,6 +326,8 @@ def test_mensajes(url):
     else:
         print("\t -> CREACION DE UN MENSAJE --> NO FUNCIONA")
     requests.get(url + 'DeleteAll')
+    #Delete Mensaje
+    incrementar_numPruebas()
     resp = requests.get(url + 'Mensajes/')
     t = resp.json()
     if len(t) == 0:
